@@ -29,6 +29,6 @@
 -(void)cancelGeocode;
 -(void)geocode:(void(^)(BOOL success))completionHandler;
 
-+(FCIPGeocoder *)sharedGeocoder;
++(FCIPAddressGeocoder *)sharedGeocoder;
 
 @end
