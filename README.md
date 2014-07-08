@@ -1,7 +1,7 @@
 FCIPAddressGeocoder
 ===================
 
-iOS Class for geocode device IP Address location through GeoIP using a block-based syntax.
+iOS Class for **geocode device IP Address location using a [free GeoIP service](https://github.com/fiorix/freegeoip)** and a block-based syntax.
 
 ##Requirements & Dependecies
 - iOS >= 5.0

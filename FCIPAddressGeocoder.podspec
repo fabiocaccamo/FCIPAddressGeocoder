@@ -4,7 +4,7 @@ Pod::Spec.new do |spec|
   spec.license      = { :type => 'UNLICENSE' }
   spec.homepage     = 'https://github.com/fabiocaccamo/FCIPAddressGeocoder'
   spec.authors      = { 'Fabio Caccamo' => 'fabio.caccamo@gmail.com' }
-  spec.summary      = 'iOS Class for geocode device IP Address location through GeoIP using a block-based syntax.'
+  spec.summary      = 'iOS Class for geocode device IP Address location using a free GeoIP service and a block-based syntax.'
   spec.source       = { :git => 'https://github.com/fabiocaccamo/FCIPAddressGeocoder.git', :tag => '1.0.0' }
   spec.source_files = 'FCIPAddressGeocoder/*.{h,m}'
   spec.platform     = :ios, '5.0'
