@@ -26,9 +26,13 @@
 @property (nonatomic, readonly, copy) NSString *locationCountry;
 @property (nonatomic, readonly, copy) NSString *locationCountryCode;
 
+@property (nonatomic, readonly, copy) NSURL* url;
+
+- (id) initWithURL:(NSURL*)url;
 -(void)cancelGeocode;
 -(void)geocode:(void(^)(BOOL success))completionHandler;
 
-+(FCIPAddressGeocoder *)sharedGeocoder;
++ (FCIPAddressGeocoder*) sharedGeocoder;
++ (FCIPAddressGeocoder*) sharedGeocoderWithURL:(NSURL*)url;
 
 @end
