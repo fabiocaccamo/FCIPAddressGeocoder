@@ -49,6 +49,7 @@
     {
         if( completionHandler ){
             completionHandler( YES );
+			return;
         }
     }
     
