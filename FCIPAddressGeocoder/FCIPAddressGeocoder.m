@@ -7,16 +7,15 @@
 
 #import "FCIPAddressGeocoder.h"
 
+#define kDefaultGeoIPURL @"http://freegeoip.net/json/" 
+
 @implementation FCIPAddressGeocoder : NSObject
 
-
--(id)init
-{
-    self = [super init];
-    
-    if( self )
-    {
-        _url = [NSURL URLWithString:@"http://freegeoip.net/json/"];
+- (id) initWithURL:(NSURL*)url {
+	NSAssert(url != nil, @"url parameter cannot be nil");
+	
+    if (self = [super init]) {
+		_url = [url copy];
         _request = [NSURLRequest requestWithURL:_url];
         _operationQueue = [NSOperationQueue new];
     }
@@ -24,6 +23,9 @@
     return self;
 }
 
+- (id) init {
+    return [self initWithURL:[NSURL URLWithString:kDefaultGeoIPURL]];
+}
 
 -(void)cancelGeocode
 {
@@ -106,16 +108,26 @@
     }];
 }
 
+- (NSURL*) url {
+	return [_url copy];
+}
 
-+(FCIPAddressGeocoder *)sharedGeocoder
-{
++ (FCIPAddressGeocoder*) sharedGeocoder {
+    return [FCIPAddressGeocoder sharedGeocoderWithURL:[NSURL URLWithString:kDefaultGeoIPURL]];
+}
+
++ (FCIPAddressGeocoder*) sharedGeocoderWithURL:(NSURL*)url {
     static FCIPAddressGeocoder *instance = nil;
     static dispatch_once_t token;
-    
+	
     dispatch_once(&token, ^{
-        instance = [[self alloc] init];
+        instance = [[self alloc] initWithURL:url];
     });
-    
+   	
+	//Make sure caller isn't trying to reinitialize us with a new URL
+	NSAssert([[instance.url absoluteString] isEqualToString:[url absoluteString]],
+			 @"Cannot reinitialize shared geocoder with a different URL than used at first initialization.");
+	
     return instance;
 }
 
