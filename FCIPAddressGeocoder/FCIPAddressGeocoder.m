@@ -12,12 +12,10 @@
 @implementation FCIPAddressGeocoder : NSObject
 
 - (id) initWithURL:(NSURL*)url {
+	NSAssert(url != nil, @"url parameter cannot be nil");
+	
     if (self = [super init]) {
-		if (!url) {
-			_url = [NSURL URLWithString:kDefaultGeoIPURL];
-		} else {
-			_url = [url copy];
-		}
+		_url = [url copy];
         _request = [NSURLRequest requestWithURL:_url];
         _operationQueue = [NSOperationQueue new];
     }
@@ -26,7 +24,7 @@
 }
 
 - (id) init {
-    return [self initWithURL:nil];
+    return [self initWithURL:[NSURL URLWithString:kDefaultGeoIPURL]];
 }
 
 -(void)cancelGeocode
@@ -115,23 +113,20 @@
 }
 
 + (FCIPAddressGeocoder*) sharedGeocoder {
-    return [FCIPAddressGeocoder sharedGeocoderWithURL:nil];
+    return [FCIPAddressGeocoder sharedGeocoderWithURL:[NSURL URLWithString:kDefaultGeoIPURL]];
 }
 
 + (FCIPAddressGeocoder*) sharedGeocoderWithURL:(NSURL*)url {
     static FCIPAddressGeocoder *instance = nil;
     static dispatch_once_t token;
-    
+	
     dispatch_once(&token, ^{
         instance = [[self alloc] initWithURL:url];
     });
    	
 	//Make sure caller isn't trying to reinitialize us with a new URL
-	if(!url) {
-		assert([[instance.url absoluteString] isEqualToString:kDefaultGeoIPURL]);
-	} else {
-		assert([[instance.url absoluteString] isEqualToString:[url absoluteString]]);
-	}
+	NSAssert([[instance.url absoluteString] isEqualToString:[url absoluteString]],
+			 @"Cannot reinitialize shared geocoder with a different URL than used at first initialization.");
 	
     return instance;
 }
