@@ -26,6 +26,8 @@
 @property (nonatomic, readonly, copy) NSString *locationCountry;
 @property (nonatomic, readonly, copy) NSString *locationCountryCode;
 
+-(id)initWithURL:(NSString *)url;
+
 -(void)cancelGeocode;
 -(void)geocode:(void(^)(BOOL success))completionHandler;
 

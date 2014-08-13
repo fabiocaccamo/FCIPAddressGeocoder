@@ -10,13 +10,24 @@
 @implementation FCIPAddressGeocoder : NSObject
 
 
+NSString *const kDefaultURL = @"http://freegeoip.net/";
+
+
 -(id)init
+{
+    return [self initWithURL:kDefaultURL];
+}
+
+
+-(id)initWithURL:(NSString *)url
 {
     self = [super init];
     
     if( self )
     {
-        _url = [NSURL URLWithString:@"http://freegeoip.net/json/"];
+        NSAssert(url != nil, @"invalid url. url parameter cannot be nil.");
+        
+        _url = [NSURL URLWithString:@"json/" relativeToURL:[NSURL URLWithString:url]];
         _request = [NSURLRequest requestWithURL:_url];
         _operationQueue = [NSOperationQueue new];
     }
