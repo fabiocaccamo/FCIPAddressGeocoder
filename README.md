@@ -1,7 +1,7 @@
 FCIPAddressGeocoder
 ===================
 
-iOS Geocoder for **geocode device IP Address location using a [free GeoIP service](https://github.com/fiorix/freegeoip)** and a block-based syntax.
+iOS Geocoder for **geocode device IP Address location using [FreeGeoIP](https://github.com/fiorix/freegeoip) service** and a block-based syntax.
 
 ##Requirements & Dependecies
 - iOS >= 5.0
@@ -23,6 +23,9 @@ FCIPAddressGeocoder *geocoder = [FCIPAddressGeocoder sharedGeocoder];
 
 //or create a new geocoder
 FCIPAddressGeocoder *geocoder = [FCIPAddressGeocoder new];
+
+//or create a new geocoder which uses a custom instance of the FreeGeoIP service [installed on your own server](https://github.com/fiorix/freegeoip#install).
+FCIPAddressGeocoder *geocoder = [FCIPAddressGeocoder initWithURL:"http://localhost:8080/"];
 ```
 ```objective-c
 //IP Address geocoding (geocoding results are cached for 1 minute)
