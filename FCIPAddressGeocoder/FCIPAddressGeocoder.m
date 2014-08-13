@@ -10,25 +10,53 @@
 @implementation FCIPAddressGeocoder : NSObject
 
 
-NSString *const kDefaultURL = @"http://freegeoip.net/";
+NSString *const defaultServiceURL = @"http://freegeoip.net/";
+static NSString *customServiceURL = nil;
+
+
++(void)setServiceURL:(NSString *)url
+{
+    NSAssert(instance == nil, @"service url cannot be set after having called the shared instance.");
+    //NSAssert(url != nil, @"service url cannot be nil.");
+    //NSAssert(customServiceURL == nil, @"service url cannot be set more than once.");
+    //NSAssert(![customServiceURL isEqualToString:defaultServiceURL], @"service url is equal to the default url.");
+    
+    customServiceURL = url;
+}
+
+
+static FCIPAddressGeocoder *instance = nil;
+
+
++(FCIPAddressGeocoder *)sharedGeocoder
+{
+    //static FCIPAddressGeocoder *instance = nil;
+    static dispatch_once_t token;
+    
+    dispatch_once(&token, ^{
+        instance = [[self alloc] init];
+    });
+    
+    return instance;
+}
 
 
 -(id)init
 {
-    return [self initWithURL:kDefaultURL];
+    return [self initWithServiceURL:(customServiceURL ? customServiceURL : defaultServiceURL)];
 }
 
 
--(id)initWithURL:(NSString *)url
+-(id)initWithServiceURL:(NSString *)url
 {
     self = [super init];
     
     if( self )
     {
-        NSAssert(url != nil, @"invalid url. url parameter cannot be nil.");
+        NSAssert(url != nil, @"service url cannot be nil.");
         
-        _url = [NSURL URLWithString:@"json/" relativeToURL:[NSURL URLWithString:url]];
-        _request = [NSURLRequest requestWithURL:_url];
+        _serviceURL = [NSURL URLWithString:@"json/" relativeToURL:[NSURL URLWithString:url]];
+        _request = [NSURLRequest requestWithURL:_serviceURL];
         _operationQueue = [NSOperationQueue new];
     }
     
@@ -115,19 +143,6 @@ NSString *const kDefaultURL = @"http://freegeoip.net/";
             _completionHandler( _error == nil );
         }
     }];
-}
-
-
-+(FCIPAddressGeocoder *)sharedGeocoder
-{
-    static FCIPAddressGeocoder *instance = nil;
-    static dispatch_once_t token;
-    
-    dispatch_once(&token, ^{
-        instance = [[self alloc] init];
-    });
-    
-    return instance;
 }
 
 

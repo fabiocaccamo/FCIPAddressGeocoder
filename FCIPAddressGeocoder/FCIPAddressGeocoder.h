@@ -10,7 +10,7 @@
 
 @interface FCIPAddressGeocoder : NSObject
 {
-    NSURL *_url;
+    NSURL *_serviceURL;
     NSURLRequest *_request;
     NSOperationQueue *_operationQueue;
     void (^_completionHandler)(BOOL success);
@@ -26,11 +26,12 @@
 @property (nonatomic, readonly, copy) NSString *locationCountry;
 @property (nonatomic, readonly, copy) NSString *locationCountryCode;
 
--(id)initWithURL:(NSString *)url;
-
 -(void)cancelGeocode;
 -(void)geocode:(void(^)(BOOL success))completionHandler;
 
+-(id)initWithServiceURL:(NSString *)url;
+
++(void)setServiceURL:(NSString *)url;
 +(FCIPAddressGeocoder *)sharedGeocoder;
 
 @end
