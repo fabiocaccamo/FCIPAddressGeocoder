@@ -16,26 +16,36 @@ static NSString *customServiceURL = nil;
 
 +(void)setServiceURL:(NSString *)url
 {
-    NSAssert(instance == nil, @"service url cannot be set after having called the shared instance.");
-    //NSAssert(url != nil, @"service url cannot be nil.");
-    //NSAssert(customServiceURL == nil, @"service url cannot be set more than once.");
-    //NSAssert(![customServiceURL isEqualToString:defaultServiceURL], @"service url is equal to the default url.");
+    NSAssert([self sharedGeocoderLazy:YES] == nil, @"service url cannot be set after having called the shared instance.");
+    NSAssert(url != nil, @"service url cannot be nil.");
+    NSAssert(customServiceURL == nil, @"service url can only be set once.");
+    NSAssert(![customServiceURL isEqualToString:defaultServiceURL], @"service url is equal to the default url.");
     
-    customServiceURL = url;
+    static dispatch_once_t token;
+    
+    dispatch_once(&token, ^{
+        customServiceURL = [url copy];
+    });
 }
-
-
-static FCIPAddressGeocoder *instance = nil;
 
 
 +(FCIPAddressGeocoder *)sharedGeocoder
 {
-    //static FCIPAddressGeocoder *instance = nil;
+    return [self sharedGeocoderLazy:NO];
+}
+
+
++(FCIPAddressGeocoder *)sharedGeocoderLazy:(BOOL)lazy
+{
+    static FCIPAddressGeocoder *instance = nil;
     static dispatch_once_t token;
     
-    dispatch_once(&token, ^{
-        instance = [[self alloc] init];
-    });
+    if(!lazy)
+    {
+        dispatch_once(&token, ^{
+            instance = [[self alloc] init];
+        });
+    }
     
     return instance;
 }
