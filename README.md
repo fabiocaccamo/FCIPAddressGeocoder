@@ -20,8 +20,10 @@ Copy `FCIPAddressGeocoder.h` and `FCIPAddressGeocoder.m` to your project.
 ```objective-c
 //if you are running an instance of the FreeGeoIP service on your own server, 
 //just set the service url in application:didFinishLaunching, otherwise the default service url will be used
+//this method will set the service url for all instances, included the shared one
 [FCIPAddressGeocoder setServiceURL:@"http://localhost:8080/"];
-
+```
+```objective-c
 //you can use the shared instance
 FCIPAddressGeocoder *geocoder = [FCIPAddressGeocoder sharedGeocoder];
 
