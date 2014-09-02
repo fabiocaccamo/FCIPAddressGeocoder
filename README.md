@@ -31,7 +31,7 @@ FCIPAddressGeocoder *geocoder = [FCIPAddressGeocoder sharedGeocoder];
 FCIPAddressGeocoder *geocoder = [FCIPAddressGeocoder new];
 
 //or create a new geocoder which uses a custom instance of the FreeGeoIP service installed on your own server
-FCIPAddressGeocoder *geocoder = [[FCIPAddressGeocoder alloc] initWithServiceURL:"http://localhost:8080/"];
+FCIPAddressGeocoder *geocoder = [[FCIPAddressGeocoder alloc] initWithServiceURL:@"http://localhost:8080/"];
 ```
 ```objective-c
 //IP Address geocoding (geocoding results are cached for 1 minute)
