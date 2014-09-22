@@ -98,6 +98,7 @@ static NSString *customServiceURL = nil;
     {
         if( completionHandler ){
             completionHandler( YES );
+            
 			return;
         }
     }
