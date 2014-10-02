@@ -26,9 +26,9 @@ Copy `FCIPAddressGeocoder.h` and `FCIPAddressGeocoder.m` to your project.
 
 ##Usage
 ```objective-c
-//the service used by default is FreeGeoIP, but you can set another default service to use for all instances created, included the shared one.
+//the service used by default is FreeGeoIP, but you can set the default service to another one
 //this method will affect the default service/url of all instances, included the shared one
-//if you need to change the default url it's recommended to do it application:didFinishLaunching
+//if you need to change the default service/url it's recommended to do it application:didFinishLaunching
 [FCIPAddressGeocoder setDefaultService:FCIPAddressGeocoderServiceTelize];
 
 //some services like FreeGeoIP are open-source, and you could need to use an instance of it running on your own server
