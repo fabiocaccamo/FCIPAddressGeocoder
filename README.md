@@ -1,4 +1,4 @@
-FCIPAddressGeocoder [![GitHub version](https://badge.fury.io/gh/fabiocaccamo%2FFCIPAddressGeocoder.svg)](http://badge.fury.io/gh/fabiocaccamo%2FFCIPAddressGeocoder)
+FCIPAddressGeocoder [![Pod version](https://badge.fury.io/co/FCIPAddressGeocoder.svg)](http://badge.fury.io/co/FCIPAddressGeocoder)
 ===================
 
 iOS Geocoder for **geocode device IP Address location using GeoIP service(s)** and a block-based syntax.
