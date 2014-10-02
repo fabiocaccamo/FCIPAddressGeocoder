@@ -101,7 +101,9 @@ static NSString *customDefaultServiceURL = nil;
     FCIPAddressGeocoderService service = (customDefaultService ? customDefaultService : kDefaultService);
     NSString *serviceURL = (customDefaultServiceURL ? customDefaultServiceURL : [FCIPAddressGeocoder getDefaultServiceURLForService:service]);
     
-    return [self initWithService:service andURL:serviceURL];
+    self = [self initWithService:service andURL:serviceURL];
+    self.canUseOtherServicesAsFallback = YES;
+    return self;
 }
 
 
@@ -117,15 +119,32 @@ static NSString *customDefaultServiceURL = nil;
     
     if( self )
     {
-        NSAssert(url != nil, @"service url cannot be nil.");
+        [self setService:service andURL:url];
         
-        _service = service;
-        _serviceURL = [NSURL URLWithString:url];
-        _request = [NSURLRequest requestWithURL:_serviceURL];
+        _servicesQueue = [[NSMutableSet alloc] init];
+        [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServiceFreeGeoIP]];
+        [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServiceTelize]];
+        [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServiceSmartIP]];
+        [_servicesQueue removeObject:[NSNumber numberWithInteger:_service]];
+        
         _operationQueue = [NSOperationQueue new];
+        
+        //by default can retry using another service only if url is equal to the default service url (not a custom url)
+        //_canUseOtherServicesAsFallback = [url isEqualToString:[FCIPAddressGeocoder getDefaultServiceURLForService:_service]];
+        _canUseOtherServicesAsFallback = NO;
     }
     
     return self;
+}
+
+
+-(void)setService:(FCIPAddressGeocoderService)service andURL:(NSString *)url
+{
+    NSAssert(url != nil, @"service url cannot be nil.");
+    
+    _service = service;
+    _serviceURL = [NSURL URLWithString:url];
+    _serviceRequest = [NSURLRequest requestWithURL:_serviceURL];
 }
 
 
@@ -164,7 +183,9 @@ static NSString *customDefaultServiceURL = nil;
     
     _geocoding = YES;
     
-    [NSURLConnection sendAsynchronousRequest:_request queue:_operationQueue completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+    //NSLog(@"geocode using service url: %@", [FCIPAddressGeocoder getDefaultServiceURLForService:_service]);
+    
+    [NSURLConnection sendAsynchronousRequest:_serviceRequest queue:_operationQueue completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
         
         if( connectionError == nil )
         {
@@ -231,11 +252,25 @@ static NSString *customDefaultServiceURL = nil;
             //NSLog(@"connection error");
         }
         
-        _geocoding = NO;
-        
-        if( _completionHandler )
+        if( _error != nil && _canUseOtherServicesAsFallback && [_servicesQueue count] > 0 )
         {
-            _completionHandler( _error == nil );
+            NSNumber *serviceKey = (NSNumber *)[[_servicesQueue allObjects] firstObject];
+            [_servicesQueue removeObject:serviceKey];
+            
+            FCIPAddressGeocoderService service = [serviceKey integerValue];
+            NSString *serviceURL = [FCIPAddressGeocoder getDefaultServiceURLForService:service];
+            
+            [self setService:service andURL:serviceURL];
+            [self geocode:_completionHandler];
+        }
+        else {
+            
+            _geocoding = NO;
+            
+            if( _completionHandler )
+            {
+                _completionHandler( _error == nil );
+            }
         }
     }];
 }

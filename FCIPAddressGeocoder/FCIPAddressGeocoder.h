@@ -18,7 +18,8 @@ typedef enum : NSUInteger {
 {
     FCIPAddressGeocoderService _service;
     NSURL *_serviceURL;
-    NSURLRequest *_request;
+    NSURLRequest *_serviceRequest;
+    NSMutableSet *_servicesQueue;
     NSOperationQueue *_operationQueue;
     void (^_completionHandler)(BOOL success);
 }
@@ -32,6 +33,8 @@ typedef enum : NSUInteger {
 @property (nonatomic, readonly, copy) NSString *locationCity;
 @property (nonatomic, readonly, copy) NSString *locationCountry;
 @property (nonatomic, readonly, copy) NSString *locationCountryCode;
+
+@property (nonatomic) BOOL canUseOtherServicesAsFallback;
 
 -(void)cancelGeocode;
 -(void)geocode:(void(^)(BOOL success))completionHandler;
