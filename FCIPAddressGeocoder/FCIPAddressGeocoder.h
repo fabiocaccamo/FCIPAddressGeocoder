@@ -8,8 +8,15 @@
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
 
+typedef enum : NSUInteger {
+    FCIPAddressGeocoderServiceFreeGeoIP,
+    FCIPAddressGeocoderServiceSmartIP,
+    FCIPAddressGeocoderServiceTelize
+} FCIPAddressGeocoderService;
+
 @interface FCIPAddressGeocoder : NSObject
 {
+    FCIPAddressGeocoderService _service;
     NSURL *_serviceURL;
     NSURLRequest *_request;
     NSOperationQueue *_operationQueue;
@@ -29,9 +36,12 @@
 -(void)cancelGeocode;
 -(void)geocode:(void(^)(BOOL success))completionHandler;
 
--(id)initWithServiceURL:(NSString *)url;
+-(id)initWithService:(FCIPAddressGeocoderService)service;
+-(id)initWithService:(FCIPAddressGeocoderService)service andURL:(NSString *)url;
 
-+(void)setServiceURL:(NSString *)url;
++(void)setDefaultService:(FCIPAddressGeocoderService)service;
++(void)setDefaultService:(FCIPAddressGeocoderService)service andURL:(NSString *)url;
+
 +(FCIPAddressGeocoder *)sharedGeocoder;
 
 @end

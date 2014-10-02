@@ -10,21 +10,66 @@
 @implementation FCIPAddressGeocoder : NSObject
 
 
-NSString *const defaultServiceURL = @"http://freegeoip.net/";
-static NSString *customServiceURL = nil;
+static FCIPAddressGeocoderService const kDefaultService = FCIPAddressGeocoderServiceFreeGeoIP;
+
+static NSString *const kDefaultServiceURLForFreeGeoIP = @"http://freegeoip.net/json/";
+static NSString *const kDefaultServiceURLForSmartIP = @"http://smart-ip.net/geoip-json/";
+static NSString *const kDefaultServiceURLForTelize = @"http://www.telize.com/geoip/";
+
+static FCIPAddressGeocoderService customDefaultService;
+static NSString *customDefaultServiceURL = nil;
 
 
-+(void)setServiceURL:(NSString *)url
++(NSString *)getDefaultServiceURLForService:(FCIPAddressGeocoderService)service
 {
-    NSAssert([self sharedGeocoderLazy:YES] == nil, @"service url cannot be set after having called the shared instance.");
-    NSAssert(url != nil, @"service url cannot be nil.");
-    NSAssert(customServiceURL == nil, @"service url can only be set once.");
-    NSAssert(![customServiceURL isEqualToString:defaultServiceURL], @"service url is equal to the default url.");
+    NSString *url = nil;
+    
+    switch (service)
+    {
+        case FCIPAddressGeocoderServiceFreeGeoIP:
+            
+            url = kDefaultServiceURLForFreeGeoIP;
+            
+            break;
+            
+        case FCIPAddressGeocoderServiceSmartIP:
+            
+            url = kDefaultServiceURLForSmartIP;
+            
+            break;
+            
+        case FCIPAddressGeocoderServiceTelize:
+            
+            url = kDefaultServiceURLForTelize;
+            
+            break;
+            
+        default:
+            
+            break;
+    }
+    
+    return url;
+}
+
+
++(void)setDefaultService:(FCIPAddressGeocoderService)service
+{
+    [self setDefaultService:service andURL:[self getDefaultServiceURLForService:service]];
+}
+
+
++(void)setDefaultService:(FCIPAddressGeocoderService)service andURL:(NSString *)url
+{
+    NSAssert([self sharedGeocoderLazy:YES] == nil, @"default service/url cannot be set after having called the shared instance.");
+    NSAssert(url != nil, @"default service url cannot be nil.");
+    NSAssert(customDefaultServiceURL == nil, @"default service/url can only be set once.");
     
     static dispatch_once_t token;
     
     dispatch_once(&token, ^{
-        customServiceURL = [url copy];
+        customDefaultService = service;
+        customDefaultServiceURL = [url copy];
     });
 }
 
@@ -53,11 +98,20 @@ static NSString *customServiceURL = nil;
 
 -(id)init
 {
-    return [self initWithServiceURL:(customServiceURL ? customServiceURL : defaultServiceURL)];
+    FCIPAddressGeocoderService service = (customDefaultService ? customDefaultService : kDefaultService);
+    NSString *serviceURL = (customDefaultServiceURL ? customDefaultServiceURL : [FCIPAddressGeocoder getDefaultServiceURLForService:service]);
+    
+    return [self initWithService:service andURL:serviceURL];
 }
 
 
--(id)initWithServiceURL:(NSString *)url
+-(id)initWithService:(FCIPAddressGeocoderService)service
+{
+    return [self initWithService:service andURL:[FCIPAddressGeocoder getDefaultServiceURLForService:service]];
+}
+
+
+-(id)initWithService:(FCIPAddressGeocoderService)service andURL:(NSString *)url
 {
     self = [super init];
     
@@ -65,7 +119,8 @@ static NSString *customServiceURL = nil;
     {
         NSAssert(url != nil, @"service url cannot be nil.");
         
-        _serviceURL = [NSURL URLWithString:@"json/" relativeToURL:[NSURL URLWithString:url]];
+        _service = service;
+        _serviceURL = [NSURL URLWithString:url];
         _request = [NSURLRequest requestWithURL:_serviceURL];
         _operationQueue = [NSOperationQueue new];
     }
@@ -128,9 +183,38 @@ static NSString *customServiceURL = nil;
                     CLLocationDegrees longitude = [[_locationInfo objectForKey:@"longitude"] doubleValue];
                     
                     _location = [[CLLocation alloc] initWithLatitude:latitude longitude:longitude];
-                    _locationCity = [_locationInfo objectForKey:@"city"];
-                    _locationCountry = [_locationInfo objectForKey:@"country_name"];
-                    _locationCountryCode = [_locationInfo objectForKey:@"country_code"];
+                    
+                    switch (_service)
+                    {
+                        case FCIPAddressGeocoderServiceFreeGeoIP:
+                            
+                            _locationCity = [_locationInfo objectForKey:@"city"];
+                            _locationCountry = [_locationInfo objectForKey:@"country_name"];
+                            _locationCountryCode = [_locationInfo objectForKey:@"country_code"];
+                            
+                            break;
+                            
+                        case FCIPAddressGeocoderServiceSmartIP:
+                            
+                            _locationCity = [_locationInfo objectForKey:@"city"];
+                            _locationCountry = [_locationInfo objectForKey:@"countryName"];
+                            _locationCountryCode = [_locationInfo objectForKey:@"countryCode"];
+                            
+                            break;
+                            
+                        case FCIPAddressGeocoderServiceTelize:
+                            
+                            //_locationCity = nil;
+                            _locationCountry = [_locationInfo objectForKey:@"country"];
+                            _locationCountryCode = [_locationInfo objectForKey:@"country_code"];
+                            
+                            break;
+                            
+                        default:
+                            
+                            break;
+                    }
+                            
                 }
                 else {
                     _error = JSONError;
