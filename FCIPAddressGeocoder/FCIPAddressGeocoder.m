@@ -270,7 +270,7 @@ static NSString *customDefaultServiceURL = nil;
         
         if( _error != nil && _canUseOtherServicesAsFallback && [_servicesQueue count] > 0 )
         {
-            NSNumber *serviceKey = (NSNumber *)[[_servicesQueue allObjects] firstObject];
+            NSNumber *serviceKey = (NSNumber *)[[_servicesQueue allObjects] objectAtIndex:0];
             [_servicesQueue removeObject:serviceKey];
             
             FCIPAddressGeocoderService service = [serviceKey integerValue];
