@@ -27,6 +27,7 @@ typedef enum : NSUInteger {
 }
 
 @property (nonatomic, readonly, getter = isGeocoding) BOOL geocoding;
+@property (nonatomic, assign) NSUInteger serviceTimeoutInterval;
 
 @property (nonatomic, readonly, strong) NSError *error;
 

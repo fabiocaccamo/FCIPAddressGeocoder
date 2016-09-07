@@ -126,20 +126,23 @@ static NSString *customDefaultServiceURL = nil;
     
     if( self )
     {
-        [self setService:service andURL:url];
-        
         _servicesQueue = [[NSMutableSet alloc] init];
         [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServiceFreeGeoIP]];
         [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServicePetabyet]];
         [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServiceSmartIP]];
         [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServiceTelize]];
-        [_servicesQueue removeObject:[NSNumber numberWithInteger:_service]];
+        [_servicesQueue removeObject:[NSNumber numberWithInteger:service]];
         
         _operationQueue = [NSOperationQueue new];
         
         //by default can retry using another service only if url is equal to the default service url (not a custom url)
         //_canUseOtherServicesAsFallback = [url isEqualToString:[FCIPAddressGeocoder getDefaultServiceURLForService:_service]];
         _canUseOtherServicesAsFallback = NO;
+        
+        
+        //by default set the total timeout to be the NSURLRequest default timeout of 60 seconds
+        _serviceTimeoutInterval = 60/_servicesQueue.count;
+        [self setService:service andURL:url];
     }
     
     return self;
@@ -152,9 +155,15 @@ static NSString *customDefaultServiceURL = nil;
     
     _service = service;
     _serviceURL = [NSURL URLWithString:url];
-    _serviceRequest = [NSURLRequest requestWithURL:_serviceURL];
+    _serviceRequest = [NSURLRequest requestWithURL:_serviceURL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:self.serviceTimeoutInterval];
 }
 
+- (void)setServiceTimeoutInterval:(NSUInteger)serviceTimeoutInterval {
+    _serviceTimeoutInterval = serviceTimeoutInterval;
+    
+    // if a service was already set, create a new NSURLRequest with the new timeout interval (immutable property)
+    if(_serviceRequest) _serviceRequest = [NSURLRequest requestWithURL:_serviceURL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:_serviceTimeoutInterval];
+}
 
 -(void)cancelGeocode
 {
@@ -265,7 +274,7 @@ static NSString *customDefaultServiceURL = nil;
         }
         else {
             _error = connectionError;
-            //NSLog(@"connection error");
+            //NSLog(@"connection error: %@", _error.localizedDescription);
         }
         
         if( _error != nil && _canUseOtherServicesAsFallback && [_servicesQueue count] > 0 )
