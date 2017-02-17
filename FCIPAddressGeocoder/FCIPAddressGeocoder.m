@@ -13,6 +13,8 @@
 static FCIPAddressGeocoderService const kDefaultService = FCIPAddressGeocoderServiceFreeGeoIP;
 
 static NSString *const kDefaultServiceURLForFreeGeoIP = @"http://freegeoip.net/json/";
+static NSString *const kDefaultServiceURLForIPApi = @"http://ip-api.com/json/";
+static NSString *const kDefaultServiceURLForNekudo = @"http://geoip.nekudo.com/api/";
 static NSString *const kDefaultServiceURLForPetabyet = @"http://api.petabyet.com/geoip/";
 static NSString *const kDefaultServiceURLForTelize = @"http://www.telize.com/geoip/";
 
@@ -29,6 +31,18 @@ static NSString *customDefaultServiceURL = nil;
         case FCIPAddressGeocoderServiceFreeGeoIP:
 
             url = kDefaultServiceURLForFreeGeoIP;
+
+            break;
+
+        case FCIPAddressGeocoderServiceIPApi:
+
+            url = kDefaultServiceURLForIPApi;
+
+            break;
+
+        case FCIPAddressGeocoderServiceNekudo:
+
+            url = kDefaultServiceURLForNekudo;
 
             break;
 
@@ -123,6 +137,8 @@ static NSString *customDefaultServiceURL = nil;
 
         _servicesQueue = [[NSMutableSet alloc] init];
         [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServiceFreeGeoIP]];
+        [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServiceIPApi]];
+        [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServiceNekudo]];
         [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServicePetabyet]];
         //[_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServiceTelize]];
         [_servicesQueue removeObject:[NSNumber numberWithInteger:_service]];
@@ -198,38 +214,69 @@ static NSString *customDefaultServiceURL = nil;
 
                 if( JSONError == nil )
                 {
-                    _locationInfo = JSONData;
-                    
-                    CLLocationDegrees latitude = [[_locationInfo objectForKey:@"latitude"] doubleValue];
-                    CLLocationDegrees longitude = [[_locationInfo objectForKey:@"longitude"] doubleValue];
-                    
-                    _location = [[CLLocation alloc] initWithLatitude:latitude longitude:longitude];
-                    
+                    NSDictionary *data = JSONData;
+                    NSNumber *dataLatitude = nil;
+                    NSNumber *dataLongitude = nil;
+                    NSString *dataIP = nil;
+                    NSString *dataCity = nil;
+                    NSString *dataCountry = nil;
+                    NSString *dataCountryCode = nil;
+
                     switch (_service)
                     {
                         case FCIPAddressGeocoderServiceFreeGeoIP:
-                            
-                            _locationCity = [_locationInfo objectForKey:@"city"];
-                            _locationCountry = [_locationInfo objectForKey:@"country_name"];
-                            _locationCountryCode = [_locationInfo objectForKey:@"country_code"];
-                            
+
+                            dataIP = [data objectForKey:@"ip"];
+                            dataLatitude = [data objectForKey:@"latitude"];
+                            dataLongitude = [data objectForKey:@"longitude"];
+                            dataCity = [data objectForKey:@"city"];
+                            dataCountry = [data objectForKey:@"country_name"];
+                            dataCountryCode = [data objectForKey:@"country_code"];
+
                             break;
-                            
+
+                        case FCIPAddressGeocoderServiceIPApi:
+
+                            dataIP = [data objectForKey:@"query"];
+                            dataLatitude = [data objectForKey:@"lat"];
+                            dataLongitude = [data objectForKey:@"lon"];
+                            dataCity = [data objectForKey:@"city"];
+                            dataCountry = [data objectForKey:@"country"];
+                            dataCountryCode = [data objectForKey:@"countryCode"];
+
+                            break;
+
+                        case FCIPAddressGeocoderServiceNekudo:
+
+                            dataIP = [data objectForKey:@"ip"];
+                            dataLatitude = [[data objectForKey:@"location"] objectForKey:@"latitude"];
+                            dataLongitude = [[data objectForKey:@"location"] objectForKey:@"longitude"];
+                            dataCity = [data objectForKey:@"city"];
+                            dataCountry = [[data objectForKey:@"country"] objectForKey:@"name"];
+                            dataCountryCode = [[data objectForKey:@"country"] objectForKey:@"code"];
+
+                            break;
+
                         case FCIPAddressGeocoderServicePetabyet:
-                            
-                            _locationCity = [_locationInfo objectForKey:@"city"];
-                            _locationCountry = [_locationInfo objectForKey:@"country"];
-                            _locationCountryCode = [_locationInfo objectForKey:@"country_code"];
-                            
-                            break;
+
+                            dataIP = [data objectForKey:@"ip"];
+                            dataLatitude = [data objectForKey:@"latitude"];
+                            dataLongitude = [data objectForKey:@"longitude"];
+                            dataCity = [data objectForKey:@"city"];
+                            dataCountry = [data objectForKey:@"country"];
+                            dataCountryCode = [data objectForKey:@"country_code"];
+
                             break;
 
                         case FCIPAddressGeocoderServiceTelize:
-                            
-                            //_locationCity = nil;
-                            _locationCountry = [_locationInfo objectForKey:@"country"];
-                            _locationCountryCode = [_locationInfo objectForKey:@"country_code"];
-                            
+
+                            //dataIP = nil;
+                            dataLatitude = [data objectForKey:@"latitude"];
+                            dataLongitude = [data objectForKey:@"longitude"];
+                            //dataCity = nil;
+                            dataCountry = [data objectForKey:@"country"];
+                            dataCountryCode = [data objectForKey:@"country_code"];
+
                             break;
 
                         default:
@@ -237,6 +284,23 @@ static NSString *customDefaultServiceURL = nil;
                             break;
                     }
 
+                    CLLocationDegrees latitude = [dataLatitude doubleValue];
+                    CLLocationDegrees longitude = [dataLongitude doubleValue];
+
+                    _location = [[CLLocation alloc] initWithLatitude:latitude longitude:longitude];
+                    _locationCity = dataCity;
+                    _locationCountry = dataCountry;
+                    _locationCountryCode = dataCountryCode;
+
+                    NSMutableDictionary *info = [[NSMutableDictionary alloc] init];
+                    [info setObject:data forKey:@"raw"]; //service response
+                    [info setObject:dataIP forKey:@"ip"];
+                    [info setObject:dataLatitude forKey:@"latitude"];
+                    [info setObject:dataLongitude forKey:@"longitude"];
+                    [info setObject:dataCity forKey:@"city"];
+                    [info setObject:dataCountry forKey:@"country"];
+                    [info setObject:dataCountryCode forKey:@"countryCode"];
+                    _locationInfo = [NSDictionary dictionaryWithDictionary:info];
                 }
                 else {
                     _error = JSONError;
