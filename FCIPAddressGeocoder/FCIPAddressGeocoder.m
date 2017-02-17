@@ -124,7 +124,7 @@ static NSString *customDefaultServiceURL = nil;
         _servicesQueue = [[NSMutableSet alloc] init];
         [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServiceFreeGeoIP]];
         [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServicePetabyet]];
-        [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServiceTelize]];
+        //[_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServiceTelize]];
         [_servicesQueue removeObject:[NSNumber numberWithInteger:_service]];
 
         _operationQueue = [NSOperationQueue new];
