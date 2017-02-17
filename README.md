@@ -4,10 +4,12 @@ FCIPAddressGeocoder ![Pod version](http://img.shields.io/cocoapods/v/FCIPAddress
 iOS Geocoder for **geocode device IP Address location using GeoIP service(s)** and a block-based syntax.
 
 ##Supported Services
-- [FreeGeoIP](https://github.com/fiorix/freegeoip)
+- [FreeGeoIP](http://freegeoip.net/) - [GitHub](https://github.com/fiorix/freegeoip)
+- [IP-Api](http://ip-api.com/)
+- [Nekudo](http://geoip.nekudo.com/)
 - [Petabyet](https://www.petabyet.com/api/)
-- [Smart-IP](http://smart-ip.net/)
-- [Telize](http://www.telize.com/)
+- [~~Smart-IP~~](http://smart-ip.net/)
+- [Telize](http://www.telize.com/) *(this service is not free anymore, you can spin up your own instance or subscribe to a paid plan)*
 
 *(feel free to suggest other services to support)*
 
@@ -29,7 +31,7 @@ Copy `FCIPAddressGeocoder.h` and `FCIPAddressGeocoder.m` to your project.
 //the service used by default is FreeGeoIP, but you can set the default service to another one
 //this method will affect the default service/url of all instances, included the shared one
 //if you need to change the default service/url it's recommended to do it application:didFinishLaunching
-[FCIPAddressGeocoder setDefaultService:FCIPAddressGeocoderServiceTelize];
+[FCIPAddressGeocoder setDefaultService:FCIPAddressGeocoderServiceFreeGeoIP];
 
 //some services like FreeGeoIP are open-source, and you could need to use an instance of it running on your own server
 [FCIPAddressGeocoder setDefaultService:FCIPAddressGeocoderServiceFreeGeoIP andURL:@"http://127.0.0.1/"];
@@ -77,26 +79,4 @@ geocoder.canUseOtherServicesAsFallback = YES;
 ```
 
 ##License
-The MIT License (MIT)
-
-Copyright (c) 2015 Fabio Caccamo - fabio.caccamo@gmail.com
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-
+Released under [MIT License](LICENSE).
