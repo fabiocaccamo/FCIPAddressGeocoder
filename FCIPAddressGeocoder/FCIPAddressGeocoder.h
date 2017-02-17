@@ -13,7 +13,7 @@ typedef enum : NSUInteger {
     FCIPAddressGeocoderServicePetabyet,
     FCIPAddressGeocoderServiceSmartIP,
     FCIPAddressGeocoderServiceTelize
-    
+
 } FCIPAddressGeocoderService;
 
 @interface FCIPAddressGeocoder : NSObject
