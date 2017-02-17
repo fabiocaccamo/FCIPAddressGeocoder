@@ -314,7 +314,7 @@ static NSString *customDefaultServiceURL = nil;
         }
         else {
             _error = connectionError;
-            //NSLog(@"connection error");
+            //NSLog(@"connection error: %@", _error.localizedDescription);
         }
 
         if( _error != nil && _canUseOtherServicesAsFallback && [_servicesQueue count] > 0 )
