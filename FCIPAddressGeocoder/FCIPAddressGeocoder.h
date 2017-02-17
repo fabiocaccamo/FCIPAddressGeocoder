@@ -20,6 +20,7 @@ typedef enum : NSUInteger {
 @interface FCIPAddressGeocoder : NSObject
 {
     FCIPAddressGeocoderService _service;
+    NSTimeInterval _serviceTimeoutInterval;
     NSURL *_serviceURL;
     NSURLRequest *_serviceRequest;
     NSMutableSet *_servicesQueue;

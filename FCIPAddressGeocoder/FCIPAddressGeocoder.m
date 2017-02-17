@@ -159,8 +159,9 @@ static NSString *customDefaultServiceURL = nil;
     NSAssert(url != nil, @"service url cannot be nil.");
 
     _service = service;
+    _serviceTimeoutInterval = 10;
     _serviceURL = [NSURL URLWithString:url];
-    _serviceRequest = [NSURLRequest requestWithURL:_serviceURL];
+    _serviceRequest = [NSURLRequest requestWithURL:_serviceURL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:_serviceTimeoutInterval];
 }
 
 
