@@ -14,7 +14,6 @@ static FCIPAddressGeocoderService const kDefaultService = FCIPAddressGeocoderSer
 
 static NSString *const kDefaultServiceURLForFreeGeoIP = @"http://freegeoip.net/json/";
 static NSString *const kDefaultServiceURLForPetabyet = @"http://api.petabyet.com/geoip/";
-static NSString *const kDefaultServiceURLForSmartIP = @"http://smart-ip.net/geoip-json/";
 static NSString *const kDefaultServiceURLForTelize = @"http://www.telize.com/geoip/";
 
 static FCIPAddressGeocoderService customDefaultService;
@@ -36,12 +35,6 @@ static NSString *customDefaultServiceURL = nil;
         case FCIPAddressGeocoderServicePetabyet:
 
             url = kDefaultServiceURLForPetabyet;
-            
-            break;
-            
-        case FCIPAddressGeocoderServiceSmartIP:
-            
-            url = kDefaultServiceURLForSmartIP;
 
             break;
 
@@ -131,7 +124,6 @@ static NSString *customDefaultServiceURL = nil;
         _servicesQueue = [[NSMutableSet alloc] init];
         [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServiceFreeGeoIP]];
         [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServicePetabyet]];
-        [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServiceSmartIP]];
         [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServiceTelize]];
         [_servicesQueue removeObject:[NSNumber numberWithInteger:_service]];
 
@@ -230,13 +222,6 @@ static NSString *customDefaultServiceURL = nil;
                             _locationCountryCode = [_locationInfo objectForKey:@"country_code"];
                             
                             break;
-                            
-                        case FCIPAddressGeocoderServiceSmartIP:
-                            
-                            _locationCity = [_locationInfo objectForKey:@"city"];
-                            _locationCountry = [_locationInfo objectForKey:@"countryName"];
-                            _locationCountryCode = [_locationInfo objectForKey:@"countryCode"];
-                            
                             break;
 
                         case FCIPAddressGeocoderServiceTelize:
