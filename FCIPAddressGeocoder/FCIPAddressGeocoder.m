@@ -329,13 +329,29 @@ static NSString *customDefaultServiceURL = nil;
                     _locationCountryCode = dataCountryCode;
 
                     NSMutableDictionary *info = [[NSMutableDictionary alloc] init];
-                    [info setObject:data forKey:@"raw"]; //service response
-                    [info setObject:dataIP forKey:@"ip"];
-                    [info setObject:dataLatitude forKey:@"latitude"];
-                    [info setObject:dataLongitude forKey:@"longitude"];
-                    [info setObject:dataCity forKey:@"city"];
-                    [info setObject:dataCountry forKey:@"country"];
-                    [info setObject:dataCountryCode forKey:@"countryCode"];
+
+                    if( data != nil ){
+                        [info setObject:data forKey:@"raw"];
+                    }
+                    if( dataIP != nil ){
+                        [info setObject:dataIP forKey:@"ip"];
+                    }
+                    if( dataLatitude != nil ){
+                        [info setObject:dataLatitude forKey:@"latitude"];
+                    }
+                    if( dataLongitude != nil ){
+                        [info setObject:dataLongitude forKey:@"longitude"];
+                    }
+                    if( dataCity != nil ){
+                        [info setObject:dataCity forKey:@"city"];
+                    }
+                    if( dataCountry != nil ){
+                        [info setObject:dataCountry forKey:@"country"];
+                    }
+                    if( dataCountryCode != nil ){
+                        [info setObject:dataCountryCode forKey:@"countryCode"];
+                    }
+
                     _locationInfo = [NSDictionary dictionaryWithDictionary:info];
                 }
                 else {
