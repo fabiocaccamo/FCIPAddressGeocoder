@@ -6,6 +6,8 @@ iOS Geocoder for **geocode device IP Address location using GeoIP service(s)** a
 ## Supported Services
 - [FreeGeoIP](http://freegeoip.net/) - [GitHub](https://github.com/fiorix/freegeoip)
 - [IP-Api](http://ip-api.com/)
+- [IPInfo](https://ipinfo.io/)
+- [IPVigilante](https://ipvigilante.com/)
 - [Nekudo](http://geoip.nekudo.com/)
 - [Petabyet](https://www.petabyet.com/api/)
 - [~~Smart-IP~~](http://smart-ip.net/)
