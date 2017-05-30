@@ -225,8 +225,7 @@ static NSString *customDefaultServiceURL = nil;
 
                     switch (_service)
                     {
-                        case FCIPAddressGeocoderServiceFreeGeoIP:
-
+                        case FCIPAddressGeocoderServiceFreeGeoIP: {
                             dataIP = [data objectForKey:@"ip"];
                             dataLatitude = [data objectForKey:@"latitude"];
                             dataLongitude = [data objectForKey:@"longitude"];
@@ -235,9 +234,8 @@ static NSString *customDefaultServiceURL = nil;
                             dataCountryCode = [data objectForKey:@"country_code"];
 
                             break;
-
-                        case FCIPAddressGeocoderServiceIPApi:
-
+                        }
+                        case FCIPAddressGeocoderServiceIPApi: {
                             dataIP = [data objectForKey:@"query"];
                             dataLatitude = [data objectForKey:@"lat"];
                             dataLongitude = [data objectForKey:@"lon"];
@@ -246,9 +244,8 @@ static NSString *customDefaultServiceURL = nil;
                             dataCountryCode = [data objectForKey:@"countryCode"];
 
                             break;
-
-                        case FCIPAddressGeocoderServiceNekudo:
-
+                        }
+                        case FCIPAddressGeocoderServiceNekudo: {
                             dataIP = [data objectForKey:@"ip"];
                             dataLatitude = [[data objectForKey:@"location"] objectForKey:@"latitude"];
                             dataLongitude = [[data objectForKey:@"location"] objectForKey:@"longitude"];
@@ -257,9 +254,8 @@ static NSString *customDefaultServiceURL = nil;
                             dataCountryCode = [[data objectForKey:@"country"] objectForKey:@"code"];
 
                             break;
-
-                        case FCIPAddressGeocoderServicePetabyet:
-
+                        }
+                        case FCIPAddressGeocoderServicePetabyet: {
                             dataIP = [data objectForKey:@"ip"];
                             dataLatitude = [data objectForKey:@"latitude"];
                             dataLongitude = [data objectForKey:@"longitude"];
@@ -268,8 +264,8 @@ static NSString *customDefaultServiceURL = nil;
                             dataCountryCode = [data objectForKey:@"country_code"];
 
                             break;
-
-                        case FCIPAddressGeocoderServiceTelize:
+                        }
+                        case FCIPAddressGeocoderServiceTelize: {
 
                             //dataIP = nil;
                             dataLatitude = [data objectForKey:@"latitude"];
@@ -279,10 +275,11 @@ static NSString *customDefaultServiceURL = nil;
                             dataCountryCode = [data objectForKey:@"country_code"];
 
                             break;
-
-                        default:
+                        }
+                        default: {
 
                             break;
+                        }
                     }
 
                     CLLocationDegrees latitude = [dataLatitude doubleValue];
