@@ -3,7 +3,7 @@ FCIPAddressGeocoder ![Pod version](http://img.shields.io/cocoapods/v/FCIPAddress
 
 iOS Geocoder for **geocode device IP Address location using GeoIP service(s)** and a block-based syntax.
 
-##Supported Services
+## Supported Services
 - [FreeGeoIP](http://freegeoip.net/) - [GitHub](https://github.com/fiorix/freegeoip)
 - [IP-Api](http://ip-api.com/)
 - [Nekudo](http://geoip.nekudo.com/)
@@ -13,20 +13,20 @@ iOS Geocoder for **geocode device IP Address location using GeoIP service(s)** a
 
 *(feel free to suggest other services to support)*
 
-##Requirements & Dependecies
+## Requirements & Dependecies
 - iOS >= 5.0
 - ARC enabled
 - CoreLocation Framework
 
-##Installation
+## Installation
 
-####CocoaPods:
+#### CocoaPods:
 `pod 'FCIPAddressGeocoder'`
 
-####Manual install:
+#### Manual install:
 Copy `FCIPAddressGeocoder.h` and `FCIPAddressGeocoder.m` to your project.
 
-##Usage
+## Usage
 ```objective-c
 //the service used by default is FreeGeoIP, but you can set the default service to another one
 //this method will affect the default service/url of all instances, included the shared one
@@ -78,5 +78,5 @@ geocoder.canUseOtherServicesAsFallback = YES;
 [geocoder cancelGeocode];
 ```
 
-##License
+## License
 Released under [MIT License](LICENSE).
