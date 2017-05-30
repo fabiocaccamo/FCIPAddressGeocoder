@@ -279,7 +279,7 @@ static NSString *customDefaultServiceURL = nil;
                             dataLongitude = [[data objectForKey:@"data"] objectForKey:@"longitude"];
                             dataCity = [[data objectForKey:@"data"] objectForKey:@"city_name"];
                             dataCountry = [[data objectForKey:@"data"] objectForKey:@"country_name"];
-                            dataCountryCode = @"";
+                            dataCountryCode = nil;
 
                             break;
                         }
