@@ -11,6 +11,8 @@
 typedef enum : NSUInteger {
     FCIPAddressGeocoderServiceFreeGeoIP,
     FCIPAddressGeocoderServiceIPApi,
+    FCIPAddressGeocoderServiceIPInfo,
+    FCIPAddressGeocoderServiceIPVigilante,
     FCIPAddressGeocoderServiceNekudo,
     FCIPAddressGeocoderServicePetabyet,
     FCIPAddressGeocoderServiceTelize
