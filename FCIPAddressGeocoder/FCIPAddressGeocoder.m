@@ -2,7 +2,7 @@
 //  FCIPAddressGeocoder.m
 //
 //  Created by Fabio Caccamo on 07/07/14.
-//  Copyright (c) 2014-present, Fabio Caccamo - fabio.caccamo@gmail.com - https://fabiocaccamo.com/ - All rights reserved.
+//  Copyright (c) 2014 Fabio Caccamo - http://www.fabiocaccamo.com/ - All rights reserved.
 //
 
 #import "FCIPAddressGeocoder.h"
@@ -12,10 +12,13 @@
 
 static FCIPAddressGeocoderService const kDefaultService = FCIPAddressGeocoderServiceFreeGeoIP;
 
-static NSString *const kDefaultServiceURLForAbstractAPI = @"https://ipgeolocation.abstractapi.com/v1/?api_key=6b61e693a91649348c591a976478e61c";
-static NSString *const kDefaultServiceURLForFreeGeoIP = @"https://freegeoip.live/json/";
-static NSString *const kDefaultServiceURLForCDNService = @"https://geoip.cdnservice.eu/api/";
+static NSString *const kDefaultServiceURLForFreeGeoIP = @"http://freegeoip.net/json/";
+static NSString *const kDefaultServiceURLForIPApi = @"http://ip-api.com/json/";
 static NSString *const kDefaultServiceURLForIPInfo = @"https://ipinfo.io/json/";
+static NSString *const kDefaultServiceURLForIPVigilante = @"https://ipvigilante.com/";
+static NSString *const kDefaultServiceURLForNekudo = @"http://geoip.nekudo.com/api/";
+static NSString *const kDefaultServiceURLForPetabyet = @"http://api.petabyet.com/geoip/";
+static NSString *const kDefaultServiceURLForTelize = @"http://www.telize.com/geoip/";
 
 static FCIPAddressGeocoderService customDefaultService;
 static NSString *customDefaultServiceURL = nil;
@@ -27,23 +30,50 @@ static NSString *customDefaultServiceURL = nil;
 
     switch (service)
     {
-        case FCIPAddressGeocoderServiceAbstractAPI:
-            url = kDefaultServiceURLForAbstractAPI;
-            break;
-
         case FCIPAddressGeocoderServiceFreeGeoIP:
+
             url = kDefaultServiceURLForFreeGeoIP;
+
             break;
 
-        case FCIPAddressGeocoderServiceCDNService:
-            url = kDefaultServiceURLForCDNService;
+        case FCIPAddressGeocoderServiceIPApi:
+
+            url = kDefaultServiceURLForIPApi;
+
             break;
 
         case FCIPAddressGeocoderServiceIPInfo:
+
             url = kDefaultServiceURLForIPInfo;
+
+            break;
+
+        case FCIPAddressGeocoderServiceIPVigilante:
+
+            url = kDefaultServiceURLForIPVigilante;
+
+            break;
+
+        case FCIPAddressGeocoderServiceNekudo:
+
+            url = kDefaultServiceURLForNekudo;
+
+            break;
+
+        case FCIPAddressGeocoderServicePetabyet:
+
+            url = kDefaultServiceURLForPetabyet;
+
+            break;
+
+        case FCIPAddressGeocoderServiceTelize:
+
+            url = kDefaultServiceURLForTelize;
+
             break;
 
         default:
+
             break;
     }
 
@@ -83,7 +113,8 @@ static NSString *customDefaultServiceURL = nil;
     static FCIPAddressGeocoder *instance = nil;
     static dispatch_once_t token;
 
-    if (!lazy) {
+    if(!lazy)
+    {
         dispatch_once(&token, ^{
             instance = [[self alloc] init];
         });
@@ -114,20 +145,24 @@ static NSString *customDefaultServiceURL = nil;
 {
     self = [super init];
 
-    if (self) {
+    if( self )
+    {
         [self setService:service andURL:url];
 
         _servicesQueue = [[NSMutableSet alloc] init];
-        [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServiceAbstractAPI]];
         [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServiceFreeGeoIP]];
+        [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServiceIPApi]];
         [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServiceIPInfo]];
-        [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServiceCDNService]];
+        [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServiceIPVigilante]];
+        [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServiceNekudo]];
+        [_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServicePetabyet]];
+        //[_servicesQueue addObject:[NSNumber numberWithInteger:FCIPAddressGeocoderServiceTelize]];
         [_servicesQueue removeObject:[NSNumber numberWithInteger:_service]];
 
         _operationQueue = [NSOperationQueue new];
 
-        // by default can retry using another service only if url is equal to the default service url (not a custom url)
-        // _canUseOtherServicesAsFallback = [url isEqualToString:[FCIPAddressGeocoder getDefaultServiceURLForService:_service]];
+        //by default can retry using another service only if url is equal to the default service url (not a custom url)
+        //_canUseOtherServicesAsFallback = [url isEqualToString:[FCIPAddressGeocoder getDefaultServiceURLForService:_service]];
         _canUseOtherServicesAsFallback = NO;
     }
 
@@ -166,9 +201,10 @@ static NSString *customDefaultServiceURL = nil;
 
 -(void)geocode:(void (^)(BOOL))completionHandler
 {
-    if (_location != nil && [[_location.timestamp dateByAddingTimeInterval:60] timeIntervalSinceNow] > 0) {
-        if (completionHandler) {
-            completionHandler(YES);
+    if( _location != nil && [[_location.timestamp dateByAddingTimeInterval:60] timeIntervalSinceNow] > 0 )
+    {
+        if( completionHandler ){
+            completionHandler( YES );
 
             return;
         }
@@ -181,19 +217,20 @@ static NSString *customDefaultServiceURL = nil;
     _geocoding = YES;
 
     //NSLog(@"geocode using service url: %@", [FCIPAddressGeocoder getDefaultServiceURLForService:_service]);
+
     [NSURLConnection sendAsynchronousRequest:_serviceRequest queue:_operationQueue completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
 
-        if (connectionError == nil) {
-
+        if( connectionError == nil )
+        {
             NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
 
-            if (httpResponse.statusCode == 200) {
-
+            if( httpResponse.statusCode == 200 )
+            {
                 NSError *JSONError = nil;
                 NSDictionary *JSONData = (NSDictionary *)[NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&JSONError];
 
-                if (JSONError == nil) {
-
+                if( JSONError == nil )
+                {
                     NSDictionary *data = JSONData;
                     NSNumber *dataLatitude = nil;
                     NSNumber *dataLongitude = nil;
@@ -202,21 +239,9 @@ static NSString *customDefaultServiceURL = nil;
                     NSString *dataCountry = nil;
                     NSString *dataCountryCode = nil;
 
-                    switch (self->_service)
+                    switch (_service)
                     {
-                        case FCIPAddressGeocoderServiceAbstractAPI: {
-
-                            dataIP = [data objectForKey:@"ip_address"];
-                            dataLatitude = [data objectForKey:@"latitude"];
-                            dataLongitude = [data objectForKey:@"longitude"];
-                            dataCity = [data objectForKey:@"city"];
-                            dataCountry = [data objectForKey:@"country"];
-                            dataCountryCode = [data objectForKey:@"country_code"];
-
-                            break;
-                        }
                         case FCIPAddressGeocoderServiceFreeGeoIP: {
-
                             dataIP = [data objectForKey:@"ip"];
                             dataLatitude = [data objectForKey:@"latitude"];
                             dataLongitude = [data objectForKey:@"longitude"];
@@ -226,8 +251,39 @@ static NSString *customDefaultServiceURL = nil;
 
                             break;
                         }
-                        case FCIPAddressGeocoderServiceCDNService: {
+                        case FCIPAddressGeocoderServiceIPApi: {
+                            dataIP = [data objectForKey:@"query"];
+                            dataLatitude = [data objectForKey:@"lat"];
+                            dataLongitude = [data objectForKey:@"lon"];
+                            dataCity = [data objectForKey:@"city"];
+                            dataCountry = [data objectForKey:@"country"];
+                            dataCountryCode = [data objectForKey:@"countryCode"];
 
+                            break;
+                        }
+                        case FCIPAddressGeocoderServiceIPInfo: {
+                            dataIP = [data objectForKey:@"ip"];
+                            NSString *dataLocation = [data objectForKey:@"loc"];
+                            NSArray *dataCoords = [dataLocation componentsSeparatedByString:@","];
+                            dataLatitude = [NSNumber numberWithFloat:[dataCoords[0] floatValue]];
+                            dataLongitude = [NSNumber numberWithFloat:[dataCoords[1] floatValue]];
+                            dataCity = [data objectForKey:@"city"];
+                            dataCountryCode = [data objectForKey:@"country"];
+                            dataCountry = [[NSLocale systemLocale] displayNameForKey:NSLocaleCountryCode value:dataCountryCode];
+
+                            break;
+                        }
+                        case FCIPAddressGeocoderServiceIPVigilante: {
+                            dataIP = [[data objectForKey:@"data"] objectForKey:@"ipv4"];
+                            dataLatitude = [[data objectForKey:@"data"] objectForKey:@"latitude"];
+                            dataLongitude = [[data objectForKey:@"data"] objectForKey:@"longitude"];
+                            dataCity = [[data objectForKey:@"data"] objectForKey:@"city_name"];
+                            dataCountry = [[data objectForKey:@"data"] objectForKey:@"country_name"];
+                            dataCountryCode = nil;
+
+                            break;
+                        }
+                        case FCIPAddressGeocoderServiceNekudo: {
                             dataIP = [data objectForKey:@"ip"];
                             dataLatitude = [[data objectForKey:@"location"] objectForKey:@"latitude"];
                             dataLongitude = [[data objectForKey:@"location"] objectForKey:@"longitude"];
@@ -237,16 +293,24 @@ static NSString *customDefaultServiceURL = nil;
 
                             break;
                         }
-                        case FCIPAddressGeocoderServiceIPInfo: {
-
+                        case FCIPAddressGeocoderServicePetabyet: {
                             dataIP = [data objectForKey:@"ip"];
-                            NSString *dataLocation = [data objectForKey:@"loc"];
-                            NSArray *dataCoords = [dataLocation componentsSeparatedByString:@","];
-                            dataLatitude = [NSNumber numberWithFloat:[dataCoords[0] floatValue]];
-                            dataLongitude = [NSNumber numberWithFloat:[dataCoords[1] floatValue]];
+                            dataLatitude = [data objectForKey:@"latitude"];
+                            dataLongitude = [data objectForKey:@"longitude"];
                             dataCity = [data objectForKey:@"city"];
-                            dataCountryCode = [data objectForKey:@"country"];
-                            dataCountry = [[NSLocale systemLocale] displayNameForKey:NSLocaleCountryCode value:dataCountryCode];
+                            dataCountry = [data objectForKey:@"country"];
+                            dataCountryCode = [data objectForKey:@"country_code"];
+
+                            break;
+                        }
+                        case FCIPAddressGeocoderServiceTelize: {
+
+                            //dataIP = nil;
+                            dataLatitude = [data objectForKey:@"latitude"];
+                            dataLongitude = [data objectForKey:@"longitude"];
+                            //dataCity = nil;
+                            dataCountry = [data objectForKey:@"country"];
+                            dataCountryCode = [data objectForKey:@"country_code"];
 
                             break;
                         }
@@ -259,69 +323,74 @@ static NSString *customDefaultServiceURL = nil;
                     CLLocationDegrees latitude = [dataLatitude doubleValue];
                     CLLocationDegrees longitude = [dataLongitude doubleValue];
 
-                    self->_location = [[CLLocation alloc] initWithLatitude:latitude longitude:longitude];
-                    self->_locationCity = dataCity;
-                    self->_locationCountry = dataCountry;
-                    self->_locationCountryCode = dataCountryCode;
+                    _location = [[CLLocation alloc] initWithLatitude:latitude longitude:longitude];
+                    _locationCity = dataCity;
+                    _locationCountry = dataCountry;
+                    _locationCountryCode = dataCountryCode;
 
                     NSMutableDictionary *info = [[NSMutableDictionary alloc] init];
 
-                    if (data != nil) {
+                    if( data != nil ){
                         [info setObject:data forKey:@"raw"];
                     }
-                    if (dataIP != nil) {
+                    if( dataIP != nil ){
                         [info setObject:dataIP forKey:@"ip"];
                     }
-                    if (dataLatitude != nil) {
+                    if( dataLatitude != nil ){
                         [info setObject:dataLatitude forKey:@"latitude"];
                     }
-                    if (dataLongitude != nil) {
+                    if( dataLongitude != nil ){
                         [info setObject:dataLongitude forKey:@"longitude"];
                     }
-                    if (dataCity != nil) {
+                    if( dataCity != nil ){
                         [info setObject:dataCity forKey:@"city"];
                     }
-                    if (dataCountry != nil) {
+                    if( dataCountry != nil ){
                         [info setObject:dataCountry forKey:@"country"];
                     }
-                    if (dataCountryCode != nil) {
+                    if( dataCountryCode != nil ){
                         [info setObject:dataCountryCode forKey:@"countryCode"];
                     }
 
-                    self->_locationInfo = [NSDictionary dictionaryWithDictionary:info];
+                    _locationInfo = [NSDictionary dictionaryWithDictionary:info];
                 }
                 else {
-                    self->_error = JSONError;
+                    _error = JSONError;
                     //NSLog(@"JSON error");
                 }
             }
             else {
-                self->_error = [NSError errorWithDomain:@"" code:kCLErrorNetwork userInfo:nil];
+                _error = [NSError errorWithDomain:@"" code:kCLErrorNetwork userInfo:nil];
+                //NSLog(@"httpResponse.statusCode error (%i)\nMaybe the service is unavailable due to maintenance or high load. Check it: http://freegeoip.net/", httpResponse.statusCode);
             }
         }
         else {
-            self->_error = connectionError;
+            _error = connectionError;
             //NSLog(@"connection error: %@", _error.localizedDescription);
         }
 
-        if (self->_error != nil && self->_canUseOtherServicesAsFallback && [self->_servicesQueue count] > 0) {
-
-            NSNumber *serviceKey = (NSNumber *)[[self->_servicesQueue allObjects] objectAtIndex:0];
-            [self->_servicesQueue removeObject:serviceKey];
+        if( _error != nil && _canUseOtherServicesAsFallback && [_servicesQueue count] > 0 )
+        {
+            NSNumber *serviceKey = (NSNumber *)[[_servicesQueue allObjects] objectAtIndex:0];
+            [_servicesQueue removeObject:serviceKey];
 
             FCIPAddressGeocoderService service = [serviceKey integerValue];
             NSString *serviceURL = [FCIPAddressGeocoder getDefaultServiceURLForService:service];
 
             [self setService:service andURL:serviceURL];
-            [self geocode:self->_completionHandler];
+            [self geocode:_completionHandler];
         }
         else {
-            self->_geocoding = NO;
-            if (self->_completionHandler) {
-                self->_completionHandler(self->_error == nil);
+
+            _geocoding = NO;
+
+            if( _completionHandler )
+            {
+                _completionHandler( _error == nil );
             }
         }
     }];
 }
+
 
 @end

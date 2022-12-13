@@ -2,17 +2,20 @@
 //  FCIPAddressGeocoder.h
 //
 //  Created by Fabio Caccamo on 07/07/14.
-//  Copyright (c) 2014-present, Fabio Caccamo - fabio.caccamo@gmail.com - https://fabiocaccamo.com/ - All rights reserved.
+//  Copyright (c) 2014 Fabio Caccamo - http://www.fabiocaccamo.com/ - All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
 
 typedef enum : NSUInteger {
-    FCIPAddressGeocoderServiceAbstractAPI,
-    FCIPAddressGeocoderServiceCDNService,
     FCIPAddressGeocoderServiceFreeGeoIP,
-    FCIPAddressGeocoderServiceIPInfo
+    FCIPAddressGeocoderServiceIPApi,
+    FCIPAddressGeocoderServiceIPInfo,
+    FCIPAddressGeocoderServiceIPVigilante,
+    FCIPAddressGeocoderServiceNekudo,
+    FCIPAddressGeocoderServicePetabyet,
+    FCIPAddressGeocoderServiceTelize
 
 } FCIPAddressGeocoderService;
 
